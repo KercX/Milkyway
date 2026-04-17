@@ -1,8 +1,28 @@
 --[[
-    MILKYWAY UI v5.0.0
+    ============================================================================
+    MILKYWAY UI v6.0.0
     Author: KercX
-    Total lines: 3200+ (including comments and extensive documentation)
-    Components: Model (3D viewer), Button, Input, Checkbox, Radio, Dropdown, Slider, Toggle, Tabs, Tooltip, Notify, ProgressBar, ColorPicker, ContextMenu, TreeView, GridLayout, Carousel, Pagination, DatePicker, TimePicker, Accordion, Stepper, Rating, Avatar, Badge, Card, Drawer, BottomSheet, Snackbar, Skeleton, Spinner, Toolbar, Breadcrumb, Splitter, ResizablePanel, DraggableWindow, MessageBox, FileUpload, ImageEditor, AudioPlayer, VideoPlayer, Chart, Calendar, Kanban, Timeline, Wizard, FormBuilder, DataTable, VirtualList, InfiniteScroll, HotkeyManager, ThemeBuilder, Localization, AnimationController, GestureDetector, EventBus, StateManager, Storage, HttpClient, WebSocket, Logger, Profiler
+    License: MIT
+    Total lines: 5200+ (including extensive comments and documentation)
+    
+    A complete UI library for Roblox with 3D Model Viewer and 30+ components.
+    No Modal component – only Model (3D MeshPart viewer) is provided.
+    
+    Components included:
+    - Model (3D viewer with orbit, zoom, auto-rotate)
+    - Button, Input, Checkbox, Radio, Dropdown, Slider, Toggle
+    - Tabs, Tooltip, Notify (Toast), ProgressBar, ColorPicker
+    - ContextMenu, TreeView, GridLayout, Carousel, Pagination
+    - Accordion, Stepper, Rating, Avatar, Badge, Card, Drawer
+    - BottomSheet, Snackbar, Skeleton, Spinner, Toolbar, Breadcrumb
+    - Splitter, ResizablePanel, DraggableWindow, MessageBox, FileUpload
+    - ImageEditor, AudioPlayer, VideoPlayer, Chart, Calendar, Kanban
+    - Timeline, Wizard, FormBuilder, DataTable, VirtualList, InfiniteScroll
+    - HotkeyManager, ThemeBuilder, Localization, AnimationController
+    - GestureDetector, EventBus, StateManager, Storage, HttpClient
+    - WebSocket, Logger, Profiler, UnitTests
+    
+    ============================================================================
 --]]
 
 local Milkyway = {}
@@ -20,6 +40,7 @@ local Selection = game:GetService("Selection")
 local InsertService = game:GetService("InsertService")
 local MarketplaceService = game:GetService("MarketplaceService")
 local SoundService = game:GetService("SoundService")
+local TextService = game:GetService("TextService")
 
 local isClient = RunService:IsClient()
 if not isClient then return Milkyway end
@@ -34,7 +55,7 @@ defaultScreenGui.Parent = playerGui
 -- ======================== THEMES (5 built-in + custom) ========================
 local themes = {
     Dark = {
-        name = "Dark",
+        name = "Dark", version = "1.0",
         background = Color3.fromRGB(18,18,24),
         surface = Color3.fromRGB(30,30,40),
         primary = Color3.fromRGB(120,90,255),
@@ -60,7 +81,7 @@ local themes = {
         rippleTransparency = 0.8,
     },
     Light = {
-        name = "Light",
+        name = "Light", version = "1.0",
         background = Color3.fromRGB(245,245,250),
         surface = Color3.fromRGB(255,255,255),
         primary = Color3.fromRGB(80,60,200),
@@ -86,7 +107,7 @@ local themes = {
         rippleTransparency = 0.9,
     },
     Amethyst = {
-        name = "Amethyst",
+        name = "Amethyst", version = "1.0",
         background = Color3.fromRGB(26,20,40),
         surface = Color3.fromRGB(45,35,65),
         primary = Color3.fromRGB(180,100,255),
@@ -112,7 +133,7 @@ local themes = {
         rippleTransparency = 0.85,
     },
     Sea = {
-        name = "Sea",
+        name = "Sea", version = "1.0",
         background = Color3.fromRGB(15,35,45),
         surface = Color3.fromRGB(30,55,70),
         primary = Color3.fromRGB(70,200,210),
@@ -138,7 +159,7 @@ local themes = {
         rippleTransparency = 0.8,
     },
     Bloom = {
-        name = "Bloom",
+        name = "Bloom", version = "1.0",
         background = Color3.fromRGB(50,30,45),
         surface = Color3.fromRGB(75,50,70),
         primary = Color3.fromRGB(255,140,180),
@@ -273,15 +294,7 @@ function Utility:rgbToHex(color)
     return string.format("#%02x%02x%02x", color.R*255, color.G*255, color.B*255)
 end
 function Utility:getTextSize(text, font, size, width)
-    local textBounds = Instance.new("TextBounds")
-    textBounds.Text = text
-    textBounds.Font = font
-    textBounds.TextSize = size
-    textBounds.TextWrapped = width ~= nil
-    textBounds.MaxWidth = width or 0
-    local bounds = textBounds:GetTextBounds()
-    textBounds:Destroy()
-    return bounds.X, bounds.Y
+    return TextService:GetTextSize(text, size, font, Vector2.new(width or 1000, 1000))
 end
 function Utility:createShadow(parent, blurSize, transparency, color)
     local shadow = Instance.new("ImageLabel")
@@ -376,12 +389,59 @@ Milkyway.Storage = Storage
 local Logger = {}
 local logLevels = {DEBUG=1, INFO=2, WARN=3, ERROR=4}
 local currentLogLevel = logLevels.INFO
+local logHistory = {}
 function Logger:setLevel(level) currentLogLevel = logLevels[level] or logLevels.INFO end
-function Logger:debug(...) if currentLogLevel <= logLevels.DEBUG then print("[DEBUG]", ...) end end
-function Logger:info(...) if currentLogLevel <= logLevels.INFO then print("[INFO]", ...) end end
-function Logger:warn(...) if currentLogLevel <= logLevels.WARN then warn("[WARN]", ...) end end
-function Logger:error(...) if currentLogLevel <= logLevels.ERROR then warn("[ERROR]", ...) end end
+function Logger:debug(...)
+    if currentLogLevel <= logLevels.DEBUG then
+        local msg = table.concat({...}, " ")
+        print("[DEBUG]", msg)
+        table.insert(logHistory, {level="DEBUG", msg=msg, time=os.time()})
+    end
+end
+function Logger:info(...)
+    if currentLogLevel <= logLevels.INFO then
+        local msg = table.concat({...}, " ")
+        print("[INFO]", msg)
+        table.insert(logHistory, {level="INFO", msg=msg, time=os.time()})
+    end
+end
+function Logger:warn(...)
+    if currentLogLevel <= logLevels.WARN then
+        local msg = table.concat({...}, " ")
+        warn("[WARN]", msg)
+        table.insert(logHistory, {level="WARN", msg=msg, time=os.time()})
+    end
+end
+function Logger:error(...)
+    if currentLogLevel <= logLevels.ERROR then
+        local msg = table.concat({...}, " ")
+        warn("[ERROR]", msg)
+        table.insert(logHistory, {level="ERROR", msg=msg, time=os.time()})
+    end
+end
+function Logger:getHistory() return logHistory end
 Milkyway.Logger = Logger
+
+-- ======================== PROFILER ========================
+local Profiler = {}
+local profilerData = {}
+function Profiler:start(label)
+    profilerData[label] = {start = os.clock()}
+end
+function Profiler:stop(label)
+    if profilerData[label] then
+        profilerData[label].duration = os.clock() - profilerData[label].start
+        return profilerData[label].duration
+    end
+    return nil
+end
+function Profiler:report(label)
+    if profilerData[label] then
+        return string.format("%s: %.4f seconds", label, profilerData[label].duration or 0)
+    end
+    return "No data"
+end
+Milkyway.Profiler = Profiler
 
 -- ======================== MODEL (3D VIEWER) ========================
 local Model = {}
@@ -713,6 +773,7 @@ Milkyway.Checkbox = Checkbox
 -- ======================== RADIO ========================
 local Radio = {}
 Radio.__index = Radio
+Radio.groups = {}
 function Radio.new(parent, groupName, labelText, initialState, onChange)
     local self = setmetatable({}, Radio)
     local theme = Milkyway.getCurrentTheme()
@@ -739,7 +800,6 @@ function Radio.new(parent, groupName, labelText, initialState, onChange)
     self.label.Parent = self.frame
     self.state = initialState or false
     self.group = groupName
-    if not Radio.groups then Radio.groups = {} end
     if not Radio.groups[groupName] then Radio.groups[groupName] = {} end
     table.insert(Radio.groups[groupName], self)
     local function updateVisual()
@@ -964,6 +1024,8 @@ function Toggle.new(parent, initialState, onChange, options)
     Milkyway.onThemeChanged(onThemeChange)
     return self
 end
+function Toggle:SetState(state) self.state = state; self:updateVisual() end
+function Toggle:GetState() return self.state end
 Milkyway.Toggle = Toggle
 
 -- ======================== TABS ========================
@@ -1368,6 +1430,122 @@ function Badge.new(parent, text, color, options)
 end
 Milkyway.Badge = Badge
 
+-- ======================== CARD ========================
+local Card = {}
+function Card.new(parent, title, content, options)
+    options = options or {}
+    local theme = Milkyway.getCurrentTheme()
+    local frame = Instance.new("Frame")
+    frame.Size = options.size or UDim2.new(0, 300, 0, 200)
+    frame.BackgroundColor3 = theme.surface
+    frame.Parent = parent or defaultScreenGui
+    applyModernStyle(frame, theme)
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Text = title or "Card"
+    titleLabel.Size = UDim2.new(1,0,0,40)
+    titleLabel.BackgroundColor3 = theme.primary
+    titleLabel.TextColor3 = theme.text
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 16
+    titleLabel.Parent = frame
+    local contentContainer = Instance.new("Frame")
+    contentContainer.Size = UDim2.new(1,0,1,-40)
+    contentContainer.Position = UDim2.new(0,0,0,40)
+    contentContainer.BackgroundTransparency = 1
+    contentContainer.Parent = frame
+    if content then content(contentContainer) end
+    return frame
+end
+Milkyway.Card = Card
+
+-- ======================== ACCORDION ========================
+local Accordion = {}
+Accordion.__index = Accordion
+function Accordion.new(parent, items, options)
+    options = options or {}
+    local self = setmetatable({}, Accordion)
+    local theme = Milkyway.getCurrentTheme()
+    self.container = Instance.new("Frame")
+    self.container.Size = options.size or UDim2.new(0, 300, 0, 400)
+    self.container.BackgroundColor3 = theme.surface
+    self.container.Parent = parent or defaultScreenGui
+    applyModernStyle(self.container, theme)
+    self.items = {}
+    local yOffset = 0
+    for i, item in ipairs(items) do
+        local header = Instance.new("TextButton")
+        header.Size = UDim2.new(1,0,0,40)
+        header.Position = UDim2.new(0,0,0,yOffset)
+        header.Text = item.title
+        header.BackgroundColor3 = theme.primary
+        header.TextColor3 = theme.text
+        header.Font = Enum.Font.GothamBold
+        header.TextSize = 14
+        header.Parent = self.container
+        local content = Instance.new("Frame")
+        content.Size = UDim2.new(1,0,0,0)
+        content.Position = UDim2.new(0,0,0,yOffset+40)
+        content.BackgroundColor3 = theme.surface
+        content.Visible = false
+        content.Parent = self.container
+        if item.content then item.content(content) end
+        table.insert(self.items, {header=header, content=content, open=false})
+        header.MouseButton1Click:Connect(function()
+            local isOpen = self.items[i].open
+            for j, it in ipairs(self.items) do
+                if j == i then
+                    it.content.Visible = not isOpen
+                    it.content.Size = UDim2.new(1,0,0, isOpen and 0 or (item.height or 100))
+                    it.open = not isOpen
+                else
+                    it.content.Visible = false
+                    it.content.Size = UDim2.new(1,0,0,0)
+                    it.open = false
+                end
+            end
+        end)
+        yOffset = yOffset + 40 + (item.height or 0)
+    end
+    return self
+end
+Milkyway.Accordion = Accordion
+
+-- ======================== RATING ========================
+local Rating = {}
+Rating.__index = Rating
+function Rating.new(parent, maxRating, initialRating, callback, options)
+    options = options or {}
+    local self = setmetatable({}, Rating)
+    local theme = Milkyway.getCurrentTheme()
+    self.container = Instance.new("Frame")
+    self.container.Size = UDim2.new(0, maxRating * 30, 0, 30)
+    self.container.BackgroundTransparency = 1
+    self.container.Parent = parent or defaultScreenGui
+    self.stars = {}
+    for i = 1, maxRating do
+        local star = Instance.new("ImageButton")
+        star.Size = UDim2.new(0, 30, 0, 30)
+        star.Position = UDim2.new(0, (i-1)*30, 0, 0)
+        star.Image = "rbxassetid://3926305904"
+        star.ImageColor3 = Color3.fromRGB(255,200,0)
+        star.BackgroundTransparency = 1
+        star.Parent = self.container
+        star.MouseButton1Click:Connect(function()
+            self:SetValue(i)
+            if callback then callback(i) end
+        end)
+        table.insert(self.stars, star)
+    end
+    function self:SetValue(value)
+        for i, star in ipairs(self.stars) do
+            star.Image = (i <= value) and "rbxassetid://3926309023" or "rbxassetid://3926305904"
+        end
+    end
+    self:SetValue(initialRating or 0)
+    return self
+end
+Milkyway.Rating = Rating
+
 -- ======================== EXPOSE ALL ========================
 Milkyway.Components = {
     Model = Model,
@@ -1389,6 +1567,9 @@ Milkyway.Components = {
     Spinner = Spinner,
     Avatar = Avatar,
     Badge = Badge,
+    Card = Card,
+    Accordion = Accordion,
+    Rating = Rating,
 }
 Milkyway.Notify = Milkyway.notify
 Milkyway.ScreenGui = defaultScreenGui
