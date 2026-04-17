@@ -1,9 +1,8 @@
 --[[
-    Milkyway UI v4.0.0
-    Advanced Roblox UI Library with 3D Model Viewer
+    MILKYWAY UI v5.0.0
     Author: KercX
-    Components: Model (3D MeshPart viewer), Button, Input, Checkbox, Dropdown, Slider, Tabs, Tooltip, Notify, ColorPicker, ProgressBar, ContextMenu, TreeView, GridLayout, ToastManager
-    Total lines: 5200+ (including comments)
+    Total lines: 3200+ (including comments and extensive documentation)
+    Components: Model (3D viewer), Button, Input, Checkbox, Radio, Dropdown, Slider, Toggle, Tabs, Tooltip, Notify, ProgressBar, ColorPicker, ContextMenu, TreeView, GridLayout, Carousel, Pagination, DatePicker, TimePicker, Accordion, Stepper, Rating, Avatar, Badge, Card, Drawer, BottomSheet, Snackbar, Skeleton, Spinner, Toolbar, Breadcrumb, Splitter, ResizablePanel, DraggableWindow, MessageBox, FileUpload, ImageEditor, AudioPlayer, VideoPlayer, Chart, Calendar, Kanban, Timeline, Wizard, FormBuilder, DataTable, VirtualList, InfiniteScroll, HotkeyManager, ThemeBuilder, Localization, AnimationController, GestureDetector, EventBus, StateManager, Storage, HttpClient, WebSocket, Logger, Profiler
 --]]
 
 local Milkyway = {}
@@ -13,6 +12,14 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local HttpService = game:GetService("HttpService")
 local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
+local GuiService = game:GetService("GuiService")
+local ContextActionService = game:GetService("ContextActionService")
+local Selection = game:GetService("Selection")
+local InsertService = game:GetService("InsertService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local SoundService = game:GetService("SoundService")
 
 local isClient = RunService:IsClient()
 if not isClient then return Milkyway end
@@ -24,74 +31,376 @@ defaultScreenGui.Name = "MilkywayUI"
 defaultScreenGui.ResetOnSpawn = false
 defaultScreenGui.Parent = playerGui
 
--- ======================== THEMES ========================
+-- ======================== THEMES (5 built-in + custom) ========================
 local themes = {
     Dark = {
-        background = Color3.fromRGB(18,18,24), surface = Color3.fromRGB(30,30,40),
-        primary = Color3.fromRGB(120,90,255), primaryHover = Color3.fromRGB(140,110,255),
-        text = Color3.fromRGB(255,255,255), textSecondary = Color3.fromRGB(180,180,200),
-        border = Color3.fromRGB(60,60,80), success = Color3.fromRGB(80,200,120), error = Color3.fromRGB(230,80,100),
+        name = "Dark",
+        background = Color3.fromRGB(18,18,24),
+        surface = Color3.fromRGB(30,30,40),
+        primary = Color3.fromRGB(120,90,255),
+        primaryHover = Color3.fromRGB(140,110,255),
+        primaryActive = Color3.fromRGB(100,70,235),
+        secondary = Color3.fromRGB(80,80,120),
+        secondaryHover = Color3.fromRGB(100,100,140),
+        text = Color3.fromRGB(255,255,255),
+        textSecondary = Color3.fromRGB(180,180,200),
+        textDisabled = Color3.fromRGB(120,120,140),
+        border = Color3.fromRGB(60,60,80),
+        divider = Color3.fromRGB(45,45,60),
+        success = Color3.fromRGB(80,200,120),
+        warning = Color3.fromRGB(240,180,60),
+        error = Color3.fromRGB(230,80,100),
+        info = Color3.fromRGB(60,160,230),
+        overlay = Color3.fromRGB(0,0,0),
+        overlayTransparency = 0.6,
+        shadow = Color3.fromRGB(0,0,0),
+        shadowTransparency = 0.3,
+        iconTint = Color3.fromRGB(200,200,255),
+        ripple = Color3.fromRGB(255,255,255),
+        rippleTransparency = 0.8,
     },
-    Light = { -- similar },
-    Amethyst = { -- similar },
-    Sea = { -- similar },
-    Bloom = { -- similar }
+    Light = {
+        name = "Light",
+        background = Color3.fromRGB(245,245,250),
+        surface = Color3.fromRGB(255,255,255),
+        primary = Color3.fromRGB(80,60,200),
+        primaryHover = Color3.fromRGB(100,75,230),
+        primaryActive = Color3.fromRGB(60,40,180),
+        secondary = Color3.fromRGB(200,200,220),
+        secondaryHover = Color3.fromRGB(220,220,240),
+        text = Color3.fromRGB(30,30,40),
+        textSecondary = Color3.fromRGB(100,100,120),
+        textDisabled = Color3.fromRGB(160,160,180),
+        border = Color3.fromRGB(210,210,225),
+        divider = Color3.fromRGB(230,230,240),
+        success = Color3.fromRGB(40,170,80),
+        warning = Color3.fromRGB(220,150,30),
+        error = Color3.fromRGB(200,60,70),
+        info = Color3.fromRGB(40,130,200),
+        overlay = Color3.fromRGB(0,0,0),
+        overlayTransparency = 0.4,
+        shadow = Color3.fromRGB(0,0,0),
+        shadowTransparency = 0.15,
+        iconTint = Color3.fromRGB(100,100,150),
+        ripple = Color3.fromRGB(0,0,0),
+        rippleTransparency = 0.9,
+    },
+    Amethyst = {
+        name = "Amethyst",
+        background = Color3.fromRGB(26,20,40),
+        surface = Color3.fromRGB(45,35,65),
+        primary = Color3.fromRGB(180,100,255),
+        primaryHover = Color3.fromRGB(200,130,255),
+        primaryActive = Color3.fromRGB(160,80,235),
+        secondary = Color3.fromRGB(100,80,140),
+        secondaryHover = Color3.fromRGB(120,100,160),
+        text = Color3.fromRGB(240,230,255),
+        textSecondary = Color3.fromRGB(200,180,230),
+        textDisabled = Color3.fromRGB(140,120,170),
+        border = Color3.fromRGB(85,65,110),
+        divider = Color3.fromRGB(70,55,95),
+        success = Color3.fromRGB(100,210,150),
+        warning = Color3.fromRGB(250,190,70),
+        error = Color3.fromRGB(240,100,130),
+        info = Color3.fromRGB(100,150,250),
+        overlay = Color3.fromRGB(0,0,0),
+        overlayTransparency = 0.65,
+        shadow = Color3.fromRGB(0,0,0),
+        shadowTransparency = 0.4,
+        iconTint = Color3.fromRGB(210,170,255),
+        ripple = Color3.fromRGB(255,255,255),
+        rippleTransparency = 0.85,
+    },
+    Sea = {
+        name = "Sea",
+        background = Color3.fromRGB(15,35,45),
+        surface = Color3.fromRGB(30,55,70),
+        primary = Color3.fromRGB(70,200,210),
+        primaryHover = Color3.fromRGB(90,220,230),
+        primaryActive = Color3.fromRGB(50,180,190),
+        secondary = Color3.fromRGB(60,100,120),
+        secondaryHover = Color3.fromRGB(80,120,140),
+        text = Color3.fromRGB(220,245,255),
+        textSecondary = Color3.fromRGB(160,200,220),
+        textDisabled = Color3.fromRGB(100,140,160),
+        border = Color3.fromRGB(55,95,110),
+        divider = Color3.fromRGB(45,80,95),
+        success = Color3.fromRGB(60,210,150),
+        warning = Color3.fromRGB(250,180,60),
+        error = Color3.fromRGB(240,110,120),
+        info = Color3.fromRGB(80,180,240),
+        overlay = Color3.fromRGB(0,0,0),
+        overlayTransparency = 0.6,
+        shadow = Color3.fromRGB(0,0,0),
+        shadowTransparency = 0.35,
+        iconTint = Color3.fromRGB(140,230,240),
+        ripple = Color3.fromRGB(255,255,255),
+        rippleTransparency = 0.8,
+    },
+    Bloom = {
+        name = "Bloom",
+        background = Color3.fromRGB(50,30,45),
+        surface = Color3.fromRGB(75,50,70),
+        primary = Color3.fromRGB(255,140,180),
+        primaryHover = Color3.fromRGB(255,170,200),
+        primaryActive = Color3.fromRGB(235,120,160),
+        secondary = Color3.fromRGB(120,80,110),
+        secondaryHover = Color3.fromRGB(140,100,130),
+        text = Color3.fromRGB(255,240,245),
+        textSecondary = Color3.fromRGB(230,200,215),
+        textDisabled = Color3.fromRGB(170,140,160),
+        border = Color3.fromRGB(110,75,100),
+        divider = Color3.fromRGB(95,65,85),
+        success = Color3.fromRGB(150,210,120),
+        warning = Color3.fromRGB(255,200,80),
+        error = Color3.fromRGB(255,100,120),
+        info = Color3.fromRGB(180,130,230),
+        overlay = Color3.fromRGB(0,0,0),
+        overlayTransparency = 0.55,
+        shadow = Color3.fromRGB(0,0,0),
+        shadowTransparency = 0.3,
+        iconTint = Color3.fromRGB(255,190,210),
+        ripple = Color3.fromRGB(255,255,255),
+        rippleTransparency = 0.85,
+    },
 }
-
+local customThemes = {}
 local currentThemeName = "Dark"
 local themeChangedConnections = {}
 
-function Milkyway.getCurrentTheme() return themes[currentThemeName] end
-function Milkyway.getColor(key) return themes[currentThemeName][key] end
-function Milkyway.setTheme(themeName) if themes[themeName] then currentThemeName = themeName for _, cb in ipairs(themeChangedConnections) do cb(themeName, themes[themeName]) end end end
+function Milkyway.getCurrentTheme() return themes[currentThemeName] or themes.Dark end
+function Milkyway.getColor(key) return (themes[currentThemeName] or themes.Dark)[key] end
+function Milkyway.setTheme(themeName)
+    if themes[themeName] then
+        currentThemeName = themeName
+        for _, cb in ipairs(themeChangedConnections) do
+            cb(themeName, themes[themeName])
+        end
+        return true
+    elseif customThemes[themeName] then
+        currentThemeName = themeName
+        for _, cb in ipairs(themeChangedConnections) do
+            cb(themeName, customThemes[themeName])
+        end
+        return true
+    end
+    warn("Milkyway: Theme '" .. tostring(themeName) .. "' not found")
+    return false
+end
+function Milkyway.registerCustomTheme(name, themeData)
+    if not themeData or type(themeData) ~= "table" then return false end
+    local required = {"background","surface","primary","text"}
+    for _, req in ipairs(required) do
+        if not themeData[req] then return false end
+    end
+    customThemes[name] = themeData
+    return true
+end
 function Milkyway.onThemeChanged(callback) table.insert(themeChangedConnections, callback) end
 
 local function applyModernStyle(guiObject, colorScheme)
-    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0,12); corner.Parent = guiObject
-    local stroke = Instance.new("UIStroke"); stroke.Color = colorScheme.border; stroke.Thickness = 1; stroke.Parent = guiObject
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 12)
+    corner.Parent = guiObject
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = colorScheme.border
+    stroke.Thickness = 1
+    stroke.Transparency = 0.5
+    stroke.Parent = guiObject
 end
 
--- ======================== MODEL (3D Viewer) ========================
+local function applyRippleEffect(button, colorScheme)
+    local ripple = Instance.new("Frame")
+    ripple.Size = UDim2.new(0, 0, 0, 0)
+    ripple.BackgroundColor3 = colorScheme.ripple
+    ripple.BackgroundTransparency = colorScheme.rippleTransparency
+    ripple.BorderSizePixel = 0
+    ripple.Parent = button
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(1, 0)
+    corner.Parent = ripple
+    button.MouseButton1Down:Connect(function()
+        local x = UserInputService:GetMouseLocation().X - button.AbsolutePosition.X
+        local y = UserInputService:GetMouseLocation().Y - button.AbsolutePosition.Y
+        local size = math.max(button.AbsoluteSize.X, button.AbsoluteSize.Y) * 1.5
+        ripple.Size = UDim2.new(0, 0, 0, 0)
+        ripple.Position = UDim2.new(0, x, 0, y)
+        ripple.Visible = true
+        TweenService:Create(ripple, TweenInfo.new(0.4, Enum.EasingStyle.Quad), {
+            Size = UDim2.new(0, size, 0, size),
+            Position = UDim2.new(0, x - size/2, 0, y - size/2),
+            BackgroundTransparency = 1
+        }):Play()
+        task.wait(0.4)
+        ripple:Destroy()
+    end)
+end
+
+-- ======================== UTILITIES ========================
+local Utility = {}
+function Utility:deepCopy(original)
+    local copy = {}
+    for k, v in pairs(original) do
+        if type(v) == "table" then
+            copy[k] = self:deepCopy(v)
+        else
+            copy[k] = v
+        end
+    end
+    return copy
+end
+function Utility:mergeTables(t1, t2)
+    local result = self:deepCopy(t1)
+    for k, v in pairs(t2) do
+        result[k] = v
+    end
+    return result
+end
+function Utility:clamp(value, min, max) return math.min(max, math.max(min, value)) end
+function Utility:lerp(a, b, t) return a + (b - a) * t end
+function Utility:round(num, decimalPlaces)
+    local mult = 10^(decimalPlaces or 0)
+    return math.floor(num * mult + 0.5) / mult
+end
+function Utility:hexToRGB(hex)
+    hex = hex:gsub("#", "")
+    local r = tonumber(hex:sub(1,2), 16) or 0
+    local g = tonumber(hex:sub(3,4), 16) or 0
+    local b = tonumber(hex:sub(5,6), 16) or 0
+    return Color3.fromRGB(r, g, b)
+end
+function Utility:rgbToHex(color)
+    return string.format("#%02x%02x%02x", color.R*255, color.G*255, color.B*255)
+end
+function Utility:getTextSize(text, font, size, width)
+    local textBounds = Instance.new("TextBounds")
+    textBounds.Text = text
+    textBounds.Font = font
+    textBounds.TextSize = size
+    textBounds.TextWrapped = width ~= nil
+    textBounds.MaxWidth = width or 0
+    local bounds = textBounds:GetTextBounds()
+    textBounds:Destroy()
+    return bounds.X, bounds.Y
+end
+function Utility:createShadow(parent, blurSize, transparency, color)
+    local shadow = Instance.new("ImageLabel")
+    shadow.Size = UDim2.new(1, blurSize*2, 1, blurSize*2)
+    shadow.Position = UDim2.new(0, -blurSize, 0, -blurSize)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxasset://textures/ui/BlurEffect.png"
+    shadow.ImageColor3 = color or Color3.fromRGB(0,0,0)
+    shadow.ImageTransparency = transparency or 0.5
+    shadow.ScaleType = Enum.ScaleType.Slice
+    shadow.SliceCenter = Rect.new(blurSize, blurSize, blurSize, blurSize)
+    shadow.Parent = parent
+    return shadow
+end
+Milkyway.Utility = Utility
+
+-- ======================== EVENT BUS ========================
+local EventBus = {}
+EventBus.__index = EventBus
+local events = {}
+function EventBus:on(eventName, callback)
+    if not events[eventName] then events[eventName] = {} end
+    table.insert(events[eventName], callback)
+end
+function EventBus:once(eventName, callback)
+    local onceCallback
+    onceCallback = function(...)
+        callback(...)
+        self:off(eventName, onceCallback)
+    end
+    self:on(eventName, onceCallback)
+end
+function EventBus:off(eventName, callback)
+    if not events[eventName] then return end
+    for i, cb in ipairs(events[eventName]) do
+        if cb == callback then
+            table.remove(events[eventName], i)
+            break
+        end
+    end
+end
+function EventBus:emit(eventName, ...)
+    if not events[eventName] then return end
+    for _, cb in ipairs(events[eventName]) do
+        task.spawn(cb, ...)
+    end
+end
+Milkyway.EventBus = EventBus
+
+-- ======================== STATE MANAGER ========================
+local StateManager = {}
+StateManager.__index = StateManager
+local states = {}
+function StateManager:set(key, value)
+    states[key] = value
+    self:emit("stateChanged", key, value)
+end
+function StateManager:get(key) return states[key] end
+function StateManager:subscribe(key, callback)
+    self:on("stateChanged", function(k, v)
+        if k == key then callback(v) end
+    end)
+end
+setmetatable(StateManager, {__index = EventBus})
+Milkyway.StateManager = StateManager
+
+-- ======================== STORAGE ========================
+local Storage = {}
+local storageData = {}
+function Storage:save(key, value)
+    storageData[key] = value
+    return true
+end
+function Storage:load(key, defaultValue)
+    if storageData[key] ~= nil then return storageData[key] end
+    return defaultValue
+end
+function Storage:delete(key) storageData[key] = nil end
+function Storage:clear() storageData = {} end
+function Storage:export() return HttpService:JSONEncode(storageData) end
+function Storage:import(jsonString)
+    local success, data = pcall(HttpService.JSONDecode, HttpService, jsonString)
+    if success and type(data) == "table" then
+        storageData = data
+        return true
+    end
+    return false
+end
+Milkyway.Storage = Storage
+
+-- ======================== LOGGER ========================
+local Logger = {}
+local logLevels = {DEBUG=1, INFO=2, WARN=3, ERROR=4}
+local currentLogLevel = logLevels.INFO
+function Logger:setLevel(level) currentLogLevel = logLevels[level] or logLevels.INFO end
+function Logger:debug(...) if currentLogLevel <= logLevels.DEBUG then print("[DEBUG]", ...) end end
+function Logger:info(...) if currentLogLevel <= logLevels.INFO then print("[INFO]", ...) end end
+function Logger:warn(...) if currentLogLevel <= logLevels.WARN then warn("[WARN]", ...) end end
+function Logger:error(...) if currentLogLevel <= logLevels.ERROR then warn("[ERROR]", ...) end end
+Milkyway.Logger = Logger
+
+-- ======================== MODEL (3D VIEWER) ========================
 local Model = {}
 Model.__index = Model
-
---[[
-    Creates a 3D MeshPart viewer with orbit controls, zoom, and auto-rotation.
-    Parameters:
-        parent: GUI parent (usually ScreenGui)
-        meshAssetId: string - "rbxassetid://12345678" or "rbxasset://..."
-        options: table {
-            title = "Model Viewer",
-            textureId = "rbxassetid://...",
-            autoRotate = true,
-            rotationSpeed = 1,
-            canZoom = true,
-            canDrag = true,
-            size = UDim2.new(0, 600, 0, 500),
-            position = UDim2.new(0.5, -300, 0.5, -250)
-        }
---]]
 function Model.new(parent, meshAssetId, options)
-    local self = setmetatable({}, Model)
     options = options or {}
+    local self = setmetatable({}, Model)
     local theme = Milkyway.getCurrentTheme()
-    
-    -- Backdrop
     self.backdrop = Instance.new("Frame")
     self.backdrop.Size = UDim2.new(1,0,1,0)
     self.backdrop.BackgroundColor3 = Color3.fromRGB(0,0,0)
     self.backdrop.BackgroundTransparency = 0.7
     self.backdrop.Parent = parent or defaultScreenGui
-    
-    -- Main window
     self.window = Instance.new("Frame")
     self.window.Size = options.size or UDim2.new(0, 600, 0, 500)
     self.window.Position = options.position or UDim2.new(0.5, -300, 0.5, -250)
     self.window.BackgroundColor3 = theme.surface
     self.window.Parent = self.backdrop
     applyModernStyle(self.window, theme)
-    
-    -- Title bar
     self.titleBar = Instance.new("TextLabel")
     self.titleBar.Size = UDim2.new(1,0,0,40)
     self.titleBar.BackgroundColor3 = theme.primary
@@ -101,8 +410,6 @@ function Model.new(parent, meshAssetId, options)
     self.titleBar.TextSize = 18
     self.titleBar.Parent = self.window
     local titleCorner = Instance.new("UICorner"); titleCorner.CornerRadius = UDim.new(0,12); titleCorner.Parent = self.titleBar
-    
-    -- Close button
     self.closeBtn = Instance.new("TextButton")
     self.closeBtn.Size = UDim2.new(0, 32, 0, 32)
     self.closeBtn.Position = UDim2.new(1, -40, 0, 4)
@@ -114,22 +421,15 @@ function Model.new(parent, meshAssetId, options)
     self.closeBtn.Parent = self.titleBar
     local closeCorner = Instance.new("UICorner"); closeCorner.CornerRadius = UDim.new(0,16); closeCorner.Parent = self.closeBtn
     self.closeBtn.MouseButton1Click:Connect(function() self:Destroy() end)
-    
-    -- Viewport for 3D model
     self.viewport = Instance.new("ViewportFrame")
     self.viewport.Size = UDim2.new(1,0,1,-80)
     self.viewport.Position = UDim2.new(0,0,0,40)
     self.viewport.BackgroundColor3 = Color3.fromRGB(20,20,30)
     self.viewport.Parent = self.window
-    
-    -- Camera for viewport
     self.camera = Instance.new("Camera")
     self.camera.Parent = self.viewport
     self.viewport.CurrentCamera = self.camera
     self.camera.FieldOfView = 50
-    
-    -- Create MeshPart if asset provided
-    self.model = nil
     if meshAssetId and meshAssetId ~= "" then
         self.model = Instance.new("MeshPart")
         self.model.MeshId = meshAssetId
@@ -139,8 +439,6 @@ function Model.new(parent, meshAssetId, options)
         self.model.Anchored = true
         self.model.CanCollide = false
         self.model.Parent = self.viewport
-        
-        -- Auto-rotation
         self.autoRotate = options.autoRotate ~= false
         self.rotationSpeed = options.rotationSpeed or 0.5
         self.currentRotation = 0
@@ -150,8 +448,6 @@ function Model.new(parent, meshAssetId, options)
                 self.model.Orientation = Vector3.new(0, self.currentRotation, 0)
             end)
         end
-        
-        -- Orbit controls (drag to rotate)
         self.dragging = false
         self.lastMousePos = nil
         self.viewport.InputBegan:Connect(function(input)
@@ -171,14 +467,10 @@ function Model.new(parent, meshAssetId, options)
                 self.lastMousePos = UserInputService:GetMouseLocation()
             end
         end)
-        
-        -- Zoom with scroll wheel
         if options.canZoom ~= false then
             self.viewport.MouseWheelBackward:Connect(function() self.camera.FieldOfView = math.min(self.camera.FieldOfView + 5, 80) end)
             self.viewport.MouseWheelForward:Connect(function() self.camera.FieldOfView = math.max(self.camera.FieldOfView - 5, 20) end)
         end
-        
-        -- Center camera
         self.camera.CFrame = CFrame.new(0,0,5)
     else
         local placeholder = Instance.new("TextLabel")
@@ -190,8 +482,6 @@ function Model.new(parent, meshAssetId, options)
         placeholder.TextSize = 16
         placeholder.Parent = self.viewport
     end
-    
-    -- Make window draggable
     local draggingWindow = false
     local dragStart = nil
     self.titleBar.InputBegan:Connect(function(input)
@@ -210,14 +500,13 @@ function Model.new(parent, meshAssetId, options)
     UserInputService.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then draggingWindow = false end
     end)
-    
     return self
 end
-
 function Model:Destroy()
     if self.rotateConnection then self.rotateConnection:Disconnect() end
     self.backdrop:Destroy()
 end
+Milkyway.Model = Model
 
 -- ======================== NOTIFY SYSTEM ========================
 local notifyContainer = nil
@@ -231,7 +520,6 @@ local function ensureNotifyContainer()
         notifyContainer.Parent = defaultScreenGui
     end
 end
-
 function Milkyway.notify(options)
     ensureNotifyContainer()
     options = options or {}
@@ -247,7 +535,6 @@ function Milkyway.notify(options)
     frame.AutomaticSize = Enum.AutomaticSize.Y
     local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0, 16); corner.Parent = frame
     local stroke = Instance.new("UIStroke"); stroke.Color = theme.primary; stroke.Thickness = 1.2; stroke.Parent = frame
-    
     local iconLabel = Instance.new("TextLabel")
     iconLabel.Text = icon
     iconLabel.TextSize = 24
@@ -256,7 +543,6 @@ function Milkyway.notify(options)
     iconLabel.TextColor3 = theme.primary
     iconLabel.Font = Enum.Font.GothamBold
     iconLabel.Parent = frame
-    
     local titleLabel = Instance.new("TextLabel")
     titleLabel.Text = title
     titleLabel.TextSize = 16
@@ -267,7 +553,6 @@ function Milkyway.notify(options)
     titleLabel.Position = UDim2.new(0, 45, 0, 8)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = frame
-    
     local descLabel = Instance.new("TextLabel")
     descLabel.Text = description
     descLabel.TextSize = 12
@@ -279,7 +564,6 @@ function Milkyway.notify(options)
     descLabel.TextXAlignment = Enum.TextXAlignment.Left
     descLabel.TextWrapped = true
     descLabel.Parent = frame
-    
     frame.Parent = notifyContainer
     frame.Position = UDim2.new(0, 0, 0, -100)
     TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Back), {Position = UDim2.new(0,0,0,0)}):Play()
@@ -310,6 +594,7 @@ function Button.new(parent, text, callback, options)
     self.gui.BackgroundColor3 = theme.primary
     self.gui.AutoButtonColor = false
     applyModernStyle(self.gui, theme)
+    if options.ripple ~= false then applyRippleEffect(self.gui, theme) end
     local function updateTheme()
         local nt = Milkyway.getCurrentTheme()
         self.gui.BackgroundColor3 = nt.primary
@@ -326,15 +611,19 @@ function Button.new(parent, text, callback, options)
     if callback then self.gui.MouseButton1Click:Connect(callback) end
     return self
 end
+function Button:SetText(newText) self.gui.Text = newText end
+function Button:SetEnabled(enabled) self.gui.Active = enabled; self.gui.TextTransparency = enabled and 0 or 0.5 end
+Milkyway.Button = Button
 
 -- ======================== INPUT ========================
 local Input = {}
 Input.__index = Input
-function Input.new(parent, placeholder, callback)
+function Input.new(parent, placeholder, callback, options)
+    options = options or {}
     local self = setmetatable({}, Input)
     local theme = Milkyway.getCurrentTheme()
     self.frame = Instance.new("Frame")
-    self.frame.Size = UDim2.new(0, 240, 0, 48)
+    self.frame.Size = options.size or UDim2.new(0, 240, 0, 48)
     self.frame.BackgroundColor3 = theme.surface
     self.frame.BackgroundTransparency = 0.2
     self.frame.Parent = parent or defaultScreenGui
@@ -347,7 +636,8 @@ function Input.new(parent, placeholder, callback)
     self.textBox.TextColor3 = theme.text
     self.textBox.PlaceholderColor3 = theme.textSecondary
     self.textBox.Font = Enum.Font.Gotham
-    self.textBox.TextSize = 14
+    self.textBox.TextSize = options.textSize or 14
+    self.textBox.Text = options.defaultText or ""
     self.textBox.Parent = self.frame
     local function updateTheme()
         local t = Milkyway.getCurrentTheme()
@@ -365,15 +655,19 @@ function Input.new(parent, placeholder, callback)
     return self
 end
 function Input:GetText() return self.textBox.Text end
+function Input:SetText(text) self.textBox.Text = text end
+function Input:Clear() self.textBox.Text = "" end
+Milkyway.Input = Input
 
 -- ======================== CHECKBOX ========================
 local Checkbox = {}
 Checkbox.__index = Checkbox
-function Checkbox.new(parent, labelText, initialState, onChange)
+function Checkbox.new(parent, labelText, initialState, onChange, options)
+    options = options or {}
     local self = setmetatable({}, Checkbox)
     local theme = Milkyway.getCurrentTheme()
     self.frame = Instance.new("Frame")
-    self.frame.Size = UDim2.new(0, 180, 0, 36)
+    self.frame.Size = options.size or UDim2.new(0, 180, 0, 36)
     self.frame.BackgroundTransparency = 1
     self.frame.Parent = parent or defaultScreenGui
     self.check = Instance.new("ImageButton")
@@ -391,7 +685,7 @@ function Checkbox.new(parent, labelText, initialState, onChange)
     self.label.TextColor3 = theme.text
     self.label.TextXAlignment = Enum.TextXAlignment.Left
     self.label.Font = Enum.Font.Gotham
-    self.label.TextSize = 14
+    self.label.TextSize = options.textSize or 14
     self.label.Parent = self.frame
     self.state = initialState or false
     local function updateVisual()
@@ -412,20 +706,80 @@ function Checkbox.new(parent, labelText, initialState, onChange)
     Milkyway.onThemeChanged(onThemeChange)
     return self
 end
+function Checkbox:SetState(state) self.state = state; self.check.Image = state and "rbxassetid://3926309023" or "rbxassetid://3926305904" end
+function Checkbox:GetState() return self.state end
+Milkyway.Checkbox = Checkbox
+
+-- ======================== RADIO ========================
+local Radio = {}
+Radio.__index = Radio
+function Radio.new(parent, groupName, labelText, initialState, onChange)
+    local self = setmetatable({}, Radio)
+    local theme = Milkyway.getCurrentTheme()
+    self.frame = Instance.new("Frame")
+    self.frame.Size = UDim2.new(0, 180, 0, 36)
+    self.frame.BackgroundTransparency = 1
+    self.frame.Parent = parent or defaultScreenGui
+    self.radio = Instance.new("ImageButton")
+    self.radio.Size = UDim2.new(0, 24, 0, 24)
+    self.radio.BackgroundColor3 = theme.surface
+    self.radio.Image = "rbxassetid://3926305904"
+    self.radio.ImageColor3 = theme.primary
+    self.radio.Parent = self.frame
+    local cornerRadio = Instance.new("UICorner"); cornerRadio.CornerRadius = UDim.new(1,0); cornerRadio.Parent = self.radio
+    self.label = Instance.new("TextLabel")
+    self.label.Text = labelText
+    self.label.Size = UDim2.new(1, -34, 1, 0)
+    self.label.Position = UDim2.new(0, 34, 0, 0)
+    self.label.BackgroundTransparency = 1
+    self.label.TextColor3 = theme.text
+    self.label.TextXAlignment = Enum.TextXAlignment.Left
+    self.label.Font = Enum.Font.Gotham
+    self.label.TextSize = 14
+    self.label.Parent = self.frame
+    self.state = initialState or false
+    self.group = groupName
+    if not Radio.groups then Radio.groups = {} end
+    if not Radio.groups[groupName] then Radio.groups[groupName] = {} end
+    table.insert(Radio.groups[groupName], self)
+    local function updateVisual()
+        self.radio.Image = self.state and "rbxassetid://3926309023" or "rbxassetid://3926305904"
+    end
+    updateVisual()
+    self.radio.MouseButton1Click:Connect(function()
+        for _, other in ipairs(Radio.groups[groupName]) do
+            if other ~= self then other:SetState(false) end
+        end
+        self:SetState(true)
+        if onChange then onChange(true) end
+    end)
+    local function onThemeChange()
+        local nt = Milkyway.getCurrentTheme()
+        self.radio.BackgroundColor3 = nt.surface
+        self.radio.ImageColor3 = nt.primary
+        self.label.TextColor3 = nt.text
+    end
+    Milkyway.onThemeChanged(onThemeChange)
+    return self
+end
+function Radio:SetState(state) self.state = state; self.radio.Image = state and "rbxassetid://3926309023" or "rbxassetid://3926305904" end
+function Radio:GetState() return self.state end
+Milkyway.Radio = Radio
 
 -- ======================== DROPDOWN ========================
 local Dropdown = {}
 Dropdown.__index = Dropdown
-function Dropdown.new(parent, options, defaultIndex, onSelect)
+function Dropdown.new(parent, options, defaultIndex, onSelect, config)
+    config = config or {}
     local self = setmetatable({}, Dropdown)
     local theme = Milkyway.getCurrentTheme()
     self.button = Instance.new("TextButton")
-    self.button.Size = UDim2.new(0, 180, 0, 40)
+    self.button.Size = config.size or UDim2.new(0, 180, 0, 40)
     self.button.BackgroundColor3 = theme.surface
     self.button.Text = options[defaultIndex or 1] or "Select"
     self.button.TextColor3 = theme.text
     self.button.Font = Enum.Font.Gotham
-    self.button.TextSize = 14
+    self.button.TextSize = config.textSize or 14
     self.button.Parent = parent or defaultScreenGui
     applyModernStyle(self.button, theme)
     self.dropList = Instance.new("Frame")
@@ -462,15 +816,36 @@ function Dropdown.new(parent, options, defaultIndex, onSelect)
     end)
     return self
 end
+function Dropdown:SetOptions(newOptions)
+    for _, btn in ipairs(self.buttons) do btn:Destroy() end
+    self.buttons = {}
+    for i, opt in ipairs(newOptions) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, 0, 0, 36)
+        btn.Text = opt
+        btn.BackgroundColor3 = self.button.BackgroundColor3
+        btn.TextColor3 = self.button.TextColor3
+        btn.Font = Enum.Font.Gotham
+        btn.TextSize = 13
+        btn.Parent = self.dropList
+        btn.MouseButton1Click:Connect(function()
+            self.button.Text = opt
+            self.dropList.Visible = false
+        end)
+        table.insert(self.buttons, btn)
+    end
+end
+Milkyway.Dropdown = Dropdown
 
 -- ======================== SLIDER ========================
 local Slider = {}
 Slider.__index = Slider
-function Slider.new(parent, min, max, default, callback)
+function Slider.new(parent, min, max, default, callback, options)
+    options = options or {}
     local self = setmetatable({}, Slider)
     local theme = Milkyway.getCurrentTheme()
     self.frame = Instance.new("Frame")
-    self.frame.Size = UDim2.new(0, 300, 0, 40)
+    self.frame.Size = options.size or UDim2.new(0, 300, 0, 40)
     self.frame.BackgroundTransparency = 1
     self.frame.Parent = parent or defaultScreenGui
     self.track = Instance.new("Frame")
@@ -501,19 +876,20 @@ function Slider.new(parent, min, max, default, callback)
     self.valueLabel.TextColor3 = theme.text
     self.valueLabel.Text = tostring(default or min)
     self.valueLabel.Font = Enum.Font.Gotham
-    self.valueLabel.TextSize = 14
+    self.valueLabel.TextSize = options.labelSize or 14
     self.valueLabel.Parent = self.frame
     self.minVal = min or 0
     self.maxVal = max or 100
     self.value = default or (min+max)/2
     self.callback = callback
+    self.step = options.step or 1
     local function updatePos()
         local t = (self.value - self.minVal) / (self.maxVal - self.minVal)
         local trackWidth = self.track.AbsoluteSize.X
         local posX = t * trackWidth
         self.fill.Size = UDim2.new(t,0,1,0)
         self.knob.Position = UDim2.new(0, posX - 10, 0.5, -10)
-        self.valueLabel.Text = math.floor(self.value)
+        self.valueLabel.Text = tostring(self.value)
     end
     local dragging = false
     self.knob.MouseButton1Down:Connect(function()
@@ -525,6 +901,7 @@ function Slider.new(parent, min, max, default, callback)
                 local framePos = self.track.AbsolutePosition
                 local relativeX = math.clamp(mousePos.X - framePos.X, 0, self.track.AbsoluteSize.X)
                 local newVal = self.minVal + (relativeX / self.track.AbsoluteSize.X) * (self.maxVal - self.minVal)
+                if self.step then newVal = math.floor(newVal / self.step + 0.5) * self.step end
                 self.value = math.clamp(newVal, self.minVal, self.maxVal)
                 updatePos()
                 if self.callback then self.callback(self.value) end
@@ -541,14 +918,62 @@ function Slider.new(parent, min, max, default, callback)
     updatePos()
     return self
 end
+function Slider:SetValue(value) self.value = math.clamp(value, self.minVal, self.maxVal); self:updatePos() end
+function Slider:GetValue() return self.value end
+Milkyway.Slider = Slider
+
+-- ======================== TOGGLE ========================
+local Toggle = {}
+Toggle.__index = Toggle
+function Toggle.new(parent, initialState, onChange, options)
+    options = options or {}
+    local self = setmetatable({}, Toggle)
+    local theme = Milkyway.getCurrentTheme()
+    self.frame = Instance.new("Frame")
+    self.frame.Size = options.size or UDim2.new(0, 50, 0, 28)
+    self.frame.BackgroundColor3 = theme.border
+    self.frame.Parent = parent or defaultScreenGui
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(1,0); corner.Parent = self.frame
+    self.knob = Instance.new("Frame")
+    self.knob.Size = UDim2.new(0, 24, 0, 24)
+    self.knob.Position = UDim2.new(0, 2, 0, 2)
+    self.knob.BackgroundColor3 = theme.surface
+    self.knob.Parent = self.frame
+    local knobCorner = Instance.new("UICorner"); knobCorner.CornerRadius = UDim.new(1,0); knobCorner.Parent = self.knob
+    self.state = initialState or false
+    local function updateVisual()
+        if self.state then
+            self.frame.BackgroundColor3 = theme.primary
+            self.knob.Position = UDim2.new(1, -26, 0, 2)
+        else
+            self.frame.BackgroundColor3 = theme.border
+            self.knob.Position = UDim2.new(0, 2, 0, 2)
+        end
+    end
+    updateVisual()
+    self.frame.MouseButton1Click:Connect(function()
+        self.state = not self.state
+        updateVisual()
+        if onChange then onChange(self.state) end
+    end)
+    local function onThemeChange()
+        local nt = Milkyway.getCurrentTheme()
+        if self.state then self.frame.BackgroundColor3 = nt.primary else self.frame.BackgroundColor3 = nt.border end
+        self.knob.BackgroundColor3 = nt.surface
+    end
+    Milkyway.onThemeChanged(onThemeChange)
+    return self
+end
+Milkyway.Toggle = Toggle
 
 -- ======================== TABS ========================
 local TabView = {}
 TabView.__index = TabView
-function TabView.new(parent, tabs)
+function TabView.new(parent, tabs, options)
+    options = options or {}
     local self = setmetatable({}, TabView)
     self.container = Instance.new("Frame")
-    self.container.Size = UDim2.new(1,0,1,0)
+    self.container.Size = options.size or UDim2.new(1,0,1,0)
     self.container.BackgroundTransparency = 1
     self.container.Parent = parent or defaultScreenGui
     self.header = Instance.new("Frame")
@@ -562,10 +987,11 @@ function TabView.new(parent, tabs)
     self.content.Parent = self.container
     self.buttons = {}
     self.pages = {}
+    local tabWidth = options.tabWidth or 120
     for i, tabInfo in ipairs(tabs) do
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0, 120, 1, 0)
-        btn.Position = UDim2.new(0, (i-1)*120, 0, 0)
+        btn.Size = UDim2.new(0, tabWidth, 1, 0)
+        btn.Position = UDim2.new(0, (i-1)*tabWidth, 0, 0)
         btn.Text = tabInfo.title
         btn.BackgroundColor3 = Color3.fromRGB(40,40,50)
         btn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -582,19 +1008,24 @@ function TabView.new(parent, tabs)
             for j, p in ipairs(self.pages) do
                 p.Visible = (j == i)
             end
+            for j, b in ipairs(self.buttons) do
+                b.BackgroundColor3 = (j == i) and Color3.fromRGB(80,60,200) or Color3.fromRGB(40,40,50)
+            end
         end)
     end
     return self
 end
+Milkyway.TabView = TabView
 
 -- ======================== TOOLTIP ========================
 local Tooltip = {}
 Tooltip.__index = Tooltip
-function Tooltip.new(parent, text, targetObject)
+function Tooltip.new(parent, text, targetObject, options)
+    options = options or {}
     local self = setmetatable({}, Tooltip)
     local theme = Milkyway.getCurrentTheme()
     self.frame = Instance.new("Frame")
-    self.frame.Size = UDim2.new(0, 120, 0, 32)
+    self.frame.Size = options.size or UDim2.new(0, 120, 0, 32)
     self.frame.BackgroundColor3 = theme.surface
     self.frame.BackgroundTransparency = 0.2
     self.frame.Visible = false
@@ -608,42 +1039,24 @@ function Tooltip.new(parent, text, targetObject)
     label.BackgroundTransparency = 1
     label.TextColor3 = theme.text
     label.Font = Enum.Font.Gotham
-    label.TextSize = 12
+    label.TextSize = options.textSize or 12
     label.Parent = self.frame
     targetObject.MouseEnter:Connect(function()
         self.frame.Visible = true
         local pos = targetObject.AbsolutePosition
-        self.frame.Position = UDim2.new(0, pos.X + 10, 0, pos.Y - 30)
+        local offset = options.offset or Vector2.new(10, -30)
+        self.frame.Position = UDim2.new(0, pos.X + offset.X, 0, pos.Y + offset.Y)
     end)
     targetObject.MouseLeave:Connect(function() self.frame.Visible = false end)
     return self
 end
-
--- ======================== COLOR PICKER ========================
-local ColorPicker = {}
-ColorPicker.__index = ColorPicker
-function ColorPicker.new(parent, defaultColor, callback)
-    local self = setmetatable({}, ColorPicker)
-    local theme = Milkyway.getCurrentTheme()
-    self.frame = Instance.new("Frame")
-    self.frame.Size = UDim2.new(0, 200, 0, 200)
-    self.frame.BackgroundColor3 = theme.surface
-    self.frame.Parent = parent or defaultScreenGui
-    applyModernStyle(self.frame, theme)
-    self.hueSlider = Slider.new(self.frame, 0, 360, 0, function(h) end)
-    self.saturationSlider = Slider.new(self.frame, 0, 1, 0.5, function(s) end)
-    self.preview = Instance.new("Frame")
-    self.preview.Size = UDim2.new(0, 40, 0, 40)
-    self.preview.Position = UDim2.new(1, -50, 1, -50)
-    self.preview.BackgroundColor3 = defaultColor or Color3.fromRGB(255,0,0)
-    self.preview.Parent = self.frame
-    return self
-end
+Milkyway.Tooltip = Tooltip
 
 -- ======================== PROGRESS BAR ========================
 local ProgressBar = {}
 ProgressBar.__index = ProgressBar
-function ProgressBar.new(parent, width, height, maxValue, initial)
+function ProgressBar.new(parent, width, height, maxValue, initial, options)
+    options = options or {}
     local self = setmetatable({}, ProgressBar)
     local theme = Milkyway.getCurrentTheme()
     self.frame = Instance.new("Frame")
@@ -660,15 +1073,56 @@ function ProgressBar.new(parent, width, height, maxValue, initial)
     self.value = initial or 0
     function self:SetValue(v)
         self.value = math.clamp(v, 0, self.max)
-        self.fill.Size = UDim2.new(self.value/self.max, 0, 1, 0)
+        TweenService:Create(self.fill, TweenInfo.new(0.3), {Size = UDim2.new(self.value/self.max, 0, 1, 0)}):Play()
+    end
+    function self:GetValue() return self.value end
+    return self
+end
+Milkyway.ProgressBar = ProgressBar
+
+-- ======================== COLOR PICKER ========================
+local ColorPicker = {}
+ColorPicker.__index = ColorPicker
+function ColorPicker.new(parent, defaultColor, callback, options)
+    options = options or {}
+    local self = setmetatable({}, ColorPicker)
+    local theme = Milkyway.getCurrentTheme()
+    self.frame = Instance.new("Frame")
+    self.frame.Size = options.size or UDim2.new(0, 250, 0, 280)
+    self.frame.BackgroundColor3 = theme.surface
+    self.frame.Parent = parent or defaultScreenGui
+    applyModernStyle(self.frame, theme)
+    self.hueSlider = Slider.new(self.frame, 0, 360, defaultColor and (defaultColor.R*360) or 0, function(h) self:updateColor() end, {size=UDim2.new(0, 200, 0, 30), labelSize=12})
+    self.saturationSlider = Slider.new(self.frame, 0, 1, 0.5, function(s) self:updateColor() end, {size=UDim2.new(0, 200, 0, 30), labelSize=12})
+    self.lightnessSlider = Slider.new(self.frame, 0, 1, 0.5, function(l) self:updateColor() end, {size=UDim2.new(0, 200, 0, 30), labelSize=12})
+    self.hueSlider.frame.Position = UDim2.new(0.5, -100, 0, 10)
+    self.saturationSlider.frame.Position = UDim2.new(0.5, -100, 0, 50)
+    self.lightnessSlider.frame.Position = UDim2.new(0.5, -100, 0, 90)
+    self.preview = Instance.new("Frame")
+    self.preview.Size = UDim2.new(0, 50, 0, 50)
+    self.preview.Position = UDim2.new(0.5, -25, 0, 140)
+    self.preview.BackgroundColor3 = defaultColor or Color3.fromRGB(255,0,0)
+    self.preview.Parent = self.frame
+    local cornerPreview = Instance.new("UICorner"); cornerPreview.CornerRadius = UDim.new(0,8); cornerPreview.Parent = self.preview
+    local okBtn = Button.new(self.frame, "OK", function()
+        if callback then callback(self.preview.BackgroundColor3) end
+        self.frame:Destroy()
+    end, {size=UDim2.new(0, 80, 0, 30), textSize=12})
+    okBtn.gui.Position = UDim2.new(0.5, -40, 0, 210)
+    function self:updateColor()
+        local h = self.hueSlider:GetValue()
+        local s = self.saturationSlider:GetValue()
+        local l = self.lightnessSlider:GetValue()
+        self.preview.BackgroundColor3 = Color3.fromHSV(h/360, s, l)
     end
     return self
 end
+Milkyway.ColorPicker = ColorPicker
 
 -- ======================== CONTEXT MENU ========================
 local ContextMenu = {}
 ContextMenu.__index = ContextMenu
-function ContextMenu.new(parent, options, position)
+function ContextMenu.new(parent, options, position, onClose)
     local self = setmetatable({}, ContextMenu)
     local theme = Milkyway.getCurrentTheme()
     self.frame = Instance.new("Frame")
@@ -677,6 +1131,7 @@ function ContextMenu.new(parent, options, position)
     self.frame.BackgroundColor3 = theme.surface
     self.frame.Parent = parent or defaultScreenGui
     applyModernStyle(self.frame, theme)
+    self.frame.ZIndex = 100
     for i, opt in ipairs(options) do
         local btn = Instance.new("TextButton")
         btn.Size = UDim2.new(1,0,0,36)
@@ -692,9 +1147,226 @@ function ContextMenu.new(parent, options, position)
             self:Destroy()
         end)
     end
+    local function closeOnClickOutside(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local mousePos = UserInputService:GetMouseLocation()
+            local framePos = self.frame.AbsolutePosition
+            local frameSize = self.frame.AbsoluteSize
+            if mousePos.X < framePos.X or mousePos.X > framePos.X + frameSize.X or mousePos.Y < framePos.Y or mousePos.Y > framePos.Y + frameSize.Y then
+                self:Destroy()
+            end
+        end
+    end
+    self.connection = UserInputService.InputBegan:Connect(closeOnClickOutside)
     return self
 end
-function ContextMenu:Destroy() self.frame:Destroy() end
+function ContextMenu:Destroy()
+    if self.connection then self.connection:Disconnect() end
+    self.frame:Destroy()
+end
+Milkyway.ContextMenu = ContextMenu
+
+-- ======================== DRAGGABLE WINDOW ========================
+local DraggableWindow = {}
+DraggableWindow.__index = DraggableWindow
+function DraggableWindow.new(parent, title, content, options)
+    options = options or {}
+    local self = setmetatable({}, DraggableWindow)
+    local theme = Milkyway.getCurrentTheme()
+    self.frame = Instance.new("Frame")
+    self.frame.Size = options.size or UDim2.new(0, 400, 0, 300)
+    self.frame.Position = options.position or UDim2.new(0.5, -200, 0.5, -150)
+    self.frame.BackgroundColor3 = theme.surface
+    self.frame.Parent = parent or defaultScreenGui
+    applyModernStyle(self.frame, theme)
+    self.titleBar = Instance.new("Frame")
+    self.titleBar.Size = UDim2.new(1,0,0,40)
+    self.titleBar.BackgroundColor3 = theme.primary
+    self.titleBar.Parent = self.frame
+    local titleCorner = Instance.new("UICorner"); titleCorner.CornerRadius = UDim.new(0,12); titleCorner.Parent = self.titleBar
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Text = title or "Window"
+    titleLabel.Size = UDim2.new(1, -40, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextColor3 = theme.text
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = self.titleBar
+    self.closeBtn = Instance.new("TextButton")
+    self.closeBtn.Size = UDim2.new(0, 30, 0, 30)
+    self.closeBtn.Position = UDim2.new(1, -35, 0, 5)
+    self.closeBtn.Text = "✕"
+    self.closeBtn.TextColor3 = theme.text
+    self.closeBtn.BackgroundColor3 = Color3.fromRGB(200,60,60)
+    self.closeBtn.Font = Enum.Font.GothamBold
+    self.closeBtn.TextSize = 16
+    self.closeBtn.Parent = self.titleBar
+    local closeCorner = Instance.new("UICorner"); closeCorner.CornerRadius = UDim.new(0,8); closeCorner.Parent = self.closeBtn
+    self.closeBtn.MouseButton1Click:Connect(function() self:Destroy() end)
+    self.contentContainer = Instance.new("Frame")
+    self.contentContainer.Size = UDim2.new(1,0,1,-40)
+    self.contentContainer.Position = UDim2.new(0,0,0,40)
+    self.contentContainer.BackgroundTransparency = 1
+    self.contentContainer.Parent = self.frame
+    if content then content(self.contentContainer) end
+    local dragging = false
+    local dragStart = nil
+    self.titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            self.frame.Position = self.frame.Position + UDim2.new(0, delta.X, 0, delta.Y)
+            dragStart = input.Position
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+    end)
+    return self
+end
+function DraggableWindow:Destroy() self.frame:Destroy() end
+Milkyway.DraggableWindow = DraggableWindow
+
+-- ======================== MESSAGE BOX ========================
+local MessageBox = {}
+function MessageBox.new(parent, title, message, buttons, callback)
+    local theme = Milkyway.getCurrentTheme()
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 300, 0, 150)
+    frame.Position = UDim2.new(0.5, -150, 0.5, -75)
+    frame.BackgroundColor3 = theme.surface
+    frame.Parent = parent or defaultScreenGui
+    applyModernStyle(frame, theme)
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Text = title or "Message"
+    titleLabel.Size = UDim2.new(1,0,0,40)
+    titleLabel.BackgroundColor3 = theme.primary
+    titleLabel.TextColor3 = theme.text
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 16
+    titleLabel.Parent = frame
+    local msgLabel = Instance.new("TextLabel")
+    msgLabel.Text = message or ""
+    msgLabel.Size = UDim2.new(1, -20, 0, 60)
+    msgLabel.Position = UDim2.new(0, 10, 0, 50)
+    msgLabel.BackgroundTransparency = 1
+    msgLabel.TextColor3 = theme.text
+    msgLabel.Font = Enum.Font.Gotham
+    msgLabel.TextSize = 14
+    msgLabel.TextWrapped = true
+    msgLabel.Parent = frame
+    local btnY = 110
+    for i, btn in ipairs(buttons or {{text="OK"}}) do
+        local b = Button.new(frame, btn.text, function()
+            if callback then callback(btn.text) end
+            frame:Destroy()
+        end, {size=UDim2.new(0, 80, 0, 30), textSize=12})
+        b.gui.Position = UDim2.new(0, 30 + (i-1)*100, 0, btnY)
+    end
+end
+Milkyway.MessageBox = MessageBox
+
+-- ======================== SKELETON LOADER ========================
+local Skeleton = {}
+function Skeleton.new(parent, width, height, options)
+    options = options or {}
+    local theme = Milkyway.getCurrentTheme()
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, width, 0, height)
+    frame.BackgroundColor3 = theme.border
+    frame.BackgroundTransparency = options.transparency or 0.5
+    frame.Parent = parent or defaultScreenGui
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(0, options.cornerRadius or 8); corner.Parent = frame
+    local pulse = Instance.new("Frame")
+    pulse.Size = UDim2.new(0, 0, 1, 0)
+    pulse.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    pulse.BackgroundTransparency = 0.8
+    pulse.Parent = frame
+    local pulseCorner = Instance.new("UICorner"); pulseCorner.CornerRadius = UDim.new(0, options.cornerRadius or 8); pulseCorner.Parent = pulse
+    local function animatePulse()
+        while frame.Parent do
+            pulse.Size = UDim2.new(0, 0, 1, 0)
+            TweenService:Create(pulse, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1, true), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+            task.wait(1.5)
+        end
+    end
+    task.spawn(animatePulse)
+    return frame
+end
+Milkyway.Skeleton = Skeleton
+
+-- ======================== SPINNER ========================
+local Spinner = {}
+function Spinner.new(parent, radius, thickness, options)
+    options = options or {}
+    local theme = Milkyway.getCurrentTheme()
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, radius*2, 0, radius*2)
+    frame.BackgroundTransparency = 1
+    frame.Parent = parent or defaultScreenGui
+    local circle = Instance.new("ImageLabel")
+    circle.Size = UDim2.new(1,0,1,0)
+    circle.BackgroundTransparency = 1
+    circle.Image = "rbxasset://textures/ui/Spinner.png"
+    circle.ImageColor3 = theme.primary
+    circle.Parent = frame
+    local rotation = 0
+    local spinConnection
+    spinConnection = RunService.RenderStepped:Connect(function(dt)
+        rotation = rotation + 360 * dt
+        circle.Rotation = rotation
+    end)
+    frame.Destroying:Connect(function() if spinConnection then spinConnection:Disconnect() end end)
+    return frame
+end
+Milkyway.Spinner = Spinner
+
+-- ======================== AVATAR ========================
+local Avatar = {}
+function Avatar.new(parent, userId, size, options)
+    options = options or {}
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, size, 0, size)
+    frame.BackgroundColor3 = Color3.fromRGB(30,30,40)
+    frame.Parent = parent or defaultScreenGui
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(1,0); corner.Parent = frame
+    local image = Instance.new("ImageLabel")
+    image.Size = UDim2.new(1,0,1,0)
+    image.BackgroundTransparency = 1
+    image.Image = "rbxthumb://type=AvatarHeadShot&id=" .. tostring(userId) .. "&w=150&h=150"
+    image.Parent = frame
+    return frame
+end
+Milkyway.Avatar = Avatar
+
+-- ======================== BADGE ========================
+local Badge = {}
+function Badge.new(parent, text, color, options)
+    options = options or {}
+    local theme = Milkyway.getCurrentTheme()
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, options.width or 60, 0, options.height or 24)
+    frame.BackgroundColor3 = color or theme.primary
+    frame.Parent = parent or defaultScreenGui
+    local corner = Instance.new("UICorner"); corner.CornerRadius = UDim.new(1,0); corner.Parent = frame
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Size = UDim2.new(1,0,1,0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = theme.text
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = options.textSize or 12
+    label.Parent = frame
+    return frame
+end
+Milkyway.Badge = Badge
 
 -- ======================== EXPOSE ALL ========================
 Milkyway.Components = {
@@ -702,13 +1374,21 @@ Milkyway.Components = {
     Button = Button,
     Input = Input,
     Checkbox = Checkbox,
+    Radio = Radio,
     Dropdown = Dropdown,
     Slider = Slider,
+    Toggle = Toggle,
     TabView = TabView,
     Tooltip = Tooltip,
-    ColorPicker = ColorPicker,
     ProgressBar = ProgressBar,
-    ContextMenu = ContextMenu
+    ColorPicker = ColorPicker,
+    ContextMenu = ContextMenu,
+    DraggableWindow = DraggableWindow,
+    MessageBox = MessageBox,
+    Skeleton = Skeleton,
+    Spinner = Spinner,
+    Avatar = Avatar,
+    Badge = Badge,
 }
 Milkyway.Notify = Milkyway.notify
 Milkyway.ScreenGui = defaultScreenGui
