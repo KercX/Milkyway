@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Milkyway UI — Modern Roblox UI Library</title>
+    <!-- Fonts & Styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #eef2ff;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e2a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(79, 70, 229, 0.3);
+            z-index: 1000;
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #6366f1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #818cf8;
+        }
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .nav-links a:hover {
+            color: #a78bfa;
+        }
+        .btn-glow {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white !important;
+            border: none;
+            transition: 0.2s;
+        }
+        .btn-glow:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 12px rgba(79, 70, 229, 0.5);
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem 4rem;
+            background: radial-gradient(circle at 30% 10%, rgba(79,70,229,0.15), transparent 60%);
+        }
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        .badge {
+            display: inline-flex;
+            gap: 12px;
+            background: #1e1e2e;
+            padding: 0.5rem 1rem;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            border: 1px solid #2d2d44;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 2rem 0 1.5rem;
+            border-left: 5px solid #6366f1;
+            padding-left: 1.2rem;
+        }
+
+        /* Cards Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+        .card {
+            background: rgba(30, 30, 42, 0.6);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(79, 70, 229, 0.3);
+            border-radius: 24px;
+            padding: 1.8rem;
+            transition: 0.25s;
+        }
+        .card:hover {
+            border-color: #818cf8;
+            transform: translateY(-4px);
+            background: rgba(40, 40, 58, 0.8);
+        }
+        .card i {
+            font-size: 2rem;
+            color: #a78bfa;
+            margin-bottom: 1rem;
+        }
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .code-block {
+            background: #0f0f17;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid #2d2d44;
+            overflow-x: auto;
+        }
+        pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .component-demo {
+            background: #13131c;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid #2a2a3c;
+        }
+        footer {
+            text-align: center;
+            padding: 3rem;
+            border-top: 1px solid #1e1e2e;
+            margin-top: 3rem;
+            color: #5b6e8c;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .section-title {
+                font-size: 1.6rem;
+            }
+        }
+        .theme-badge {
+            background: #2d2d44;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">
+        <i class="fas fa-moon"></i> 
+        <span>Milkyway UI</span>
+    </div>
+    <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#docs">Docs</a>
+        <a href="#themes">Themes</a>
+        <a href="#examples">Examples</a>
+        <a href="https://github.com" class="btn-glow"><i class="fab fa-github"></i> GitHub</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div>
+        <div class="badge">
+            <span>✨ Modern Design</span>
+            <span>⚡ Smooth Animations</span>
+            <span>🎨 5+ Themes</span>
+        </div>
+        <h1>Milkyway UI</h1>
+        <p>The most advanced, modern, and customizable UI library for Roblox Executors. Inspired by Discord &amp; WindUI.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="#getting-started" class="btn-glow" style="background: #4f46e5;">Get Started</a>
+            <a href="#docs" style="background: #2d2d44; padding: 0.5rem 1.2rem; border-radius: 40px; color:white; text-decoration: none;">Read Docs</a>
+        </div>
+    </div>
+</section>
+
+<div class="container" id="features">
+    <h2 class="section-title">✨ Why Milkyway?</h2>
+    <div class="grid">
+        <div class="card"><i class="fas fa-palette"></i><h3>5+ Premium Themes</h3><p>Dark, Light, Ocean, Amethyst, Sunset — switch with one line.</p></div>
+        <div class="card"><i class="fas fa-bell"></i><h3>Discord‑style Notifications</h3><p>Stackable, timed, color‑coded notifs under profile avatar.</p></div>
+        <div class="card"><i class="fas fa-tachometer-alt"></i><h3>Smooth Animations</h3><p>TweenService powered, buttery transitions & ripples.</p></div>
+        <div class="card"><i class="fas fa-code"></i><h3>Clean API</h3><p>Intuitive methods: CreateButton, CreateToggle, CreateSlider, etc.</p></div>
+        <div class="card"><i class="fas fa-eye-dropper"></i><h3>Color Picker</h3><p>Built‑in RGB picker for ultimate customization.</p></div>
+        <div class="card"><i class="fas fa-mouse-pointer"></i><h3>Drag & Drop / Minimize</h3><p>Move window anywhere, collapse to title bar.</p></div>
+    </div>
+</div>
+
+<div class="container" id="getting-started">
+    <h2 class="section-title">🚀 Getting Started</h2>
+    <div class="code-block">
+        <pre><code class="language-lua">-- Load Milkyway UI (place at top of your script)
+local Milkyway = loadstring(game:HttpGet("https://milky.vercel.app/milkyway.lua"))()
+
+-- Create main window (automatically appears with left profile panel)
+local mainTab = Milkyway:CreateTab("🏠", "Home")
+local settingsTab = Milkyway:CreateTab("⚙️", "Settings")
+
+-- Button example
+Milkyway:CreateButton(mainTab, "Click Me", "🔘", function()
+    Milkyway:Notify("System", "Button clicked!", "success", 2)
+end)
+
+-- Toggle
+Milkyway:CreateToggle(mainTab, "Enable Feature", true, function(state)
+    print("Feature toggled:", state)
+end)
+
+-- Slider
+Milkyway:CreateSlider(mainTab, "Volume", 0, 100, 50, "%", function(value)
+    game:GetService("SoundService").MasterVolume = value / 100
+end)
+
+-- Dropdown
+Milkyway:CreateDropdown(mainTab, "Select Mode", {"Auto", "Semi", "Manual"}, function(selected)
+    print("Mode:", selected)
+end)
+
+-- Theme selector (adds theme buttons automatically)
+Milkyway:CreateThemeSelector(settingsTab)
+
+-- Notification (Discord-style under left avatar)
+Milkyway:Notify("Milkyway", "Library ready!", "info", 3)</code></pre>
+    </div>
+    <p style="margin-top: 1rem;">🎯 Place the loader at the top of your script. All UI elements are fully documented.</p>
+</div>
+
+<div class="container" id="docs">
+    <h2 class="section-title">📚 Full Documentation</h2>
+    
+    <div class="component-demo">
+        <h3><i class="fas fa-plus-circle"></i> CreateTab</h3>
+        <p>Creates a new tab in the sidebar.</p>
+        <pre><code class="language-lua">local myTab = Milkyway:CreateTab("icon", "TabName")</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-paragraph"></i> CreateSection</h3>
+        <pre><code class="language-lua">Milkyway:CreateSection(parent, "Section Title", "Optional description")</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-square"></i> CreateButton</h3>
+        <pre><code class="language-lua">Milkyway:CreateButton(parent, "Text", "icon", callback)</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-toggle-on"></i> CreateToggle</h3>
+        <pre><code class="language-lua">Milkyway:CreateToggle(parent, "Label", defaultBoolean, callback(state))</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-sliders-h"></i> CreateSlider</h3>
+        <pre><code class="language-lua">Milkyway:CreateSlider(parent, "Label", min, max, default, "suffix", callback(value))</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-caret-down"></i> CreateDropdown</h3>
+        <pre><code class="language-lua">Milkyway:CreateDropdown(parent, "Label", {"opt1","opt2"}, callback(selected))</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-keyboard"></i> CreateInput</h3>
+        <pre><code class="language-lua">Milkyway:CreateInput(parent, "placeholder", callback(text))</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-chart-line"></i> CreateProgress</h3>
+        <pre><code class="language-lua">local updateProgress = Milkyway:CreateProgress(parent, "Loading", 0)
+updateProgress(75) -- updates bar</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-fill-drip"></i> CreateColorPicker</h3>
+        <pre><code class="language-lua">Milkyway:CreateColorPicker(parent, "Color", Color3.fromRGB(255,100,100), callback(newColor))</code></pre>
+    </div>
+
+    <div class="component-demo">
+        <h3><i class="fas fa-bell"></i> Notify (Discord‑style)</h3>
+        <pre><code class="language-lua">Milkyway:Notify("Title", "Message", "info/success/error/warning", durationSeconds)</code></pre>
+        <p><span class="theme-badge">info</span> <span class="theme-badge">success</span> <span class="theme-badge">error</span> <span class="theme-badge">warning</span></p>
+    </div>
+</div>
+
+<div class="container" id="themes">
+    <h2 class="section-title">🎨 Built‑in Themes</h2>
+    <div class="grid">
+        <div class="card"><i class="fas fa-moon"></i><h3>Dark</h3><p>Deep night, default elegance.</p></div>
+        <div class="card"><i class="fas fa-sun"></i><h3>Light</h3><p>Crisp & clean daytime mode.</p></div>
+        <div class="card"><i class="fas fa-water"></i><h3>Ocean</h3><p>Calming deep blue tones.</p></div>
+        <div class="card"><i class="fas fa-gem"></i><h3>Amethyst</h3><p>Royal purple mystical vibe.</p></div>
+        <div class="card"><i class="fas fa-tree"></i><h3>Forest</h3><p>Natural green serenity.</p></div>
+        <div class="card"><i class="fas fa-fire"></i><h3>Sunset</h3><p>Warm orange & crimson.</p></div>
+    </div>
+    <div class="code-block">
+        <pre><code class="language-lua">Milkyway:ApplyTheme("Ocean") -- instantly changes UI</code></pre>
+    </div>
+</div>
+
+<div class="container" id="examples">
+    <h2 class="section-title">🖥️ Real‑World Example</h2>
+    <div class="code-block">
+        <pre><code class="language-lua">local Milky = loadstring(game:HttpGet("https://milky.vercel.app/milkyway.lua"))()
+
+local main = Milky:CreateTab("🏠", "Main")
+local cfg = Milky:CreateTab("⚙️", "Config")
+
+Milky:CreateSection(main, "Player")
+Milky:CreateButton(main, "Kill All", "💀", function()
+    for _, plr in pairs(game.Players:GetPlayers()) do
+        if plr.Character then plr.Character.Humanoid.Health = 0 end
+    end
+    Milky:Notify("Combat", "Executed!", "error", 2)
+end)
+
+local flyEnabled = false
+Milky:CreateToggle(main, "Fly Mode", false, function(state)
+    flyEnabled = state
+    -- fly code here
+end)
+
+Milky:CreateSlider(main, "WalkSpeed", 16, 120, 16, "", function(val)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = val
+end)
+
+Milky:CreateThemeSelector(cfg)
+Milky:Notify("Milkyway", "Example script ready", "success", 2)</code></pre>
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 Milkyway UI — Designed for modern Roblox executors. Not affiliated with Roblox Corporation.</p>
+    <p style="margin-top: 0.5rem;"><i class="fab fa-discord"></i> Discord / <i class="fab fa-github"></i> GitHub</p>
+</footer>
+
+<script>
+    hljs.highlightAll();
+</script>
+</body>
+</html>
